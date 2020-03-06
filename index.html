@@ -1,0 +1,378 @@
+<!doctype html>
+<html>
+  <head>
+
+    <title>A WINNER IS WHO</title>
+
+    <style>
+
+    </style>
+
+  </head>
+  <body>
+
+      <h1 id="playerTurnTracker"></h1>
+      <!--<button id="changeTurnTester">Change Turn</button>-->
+
+      <table border="1" style="width: 90%; margin-left: 5%; margin-top: 5vh;">
+        <tr>
+          <td style="padding-left: 30px;" id="statusBar" colspan="2">
+
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="height: 60vh;">
+
+            <img id="player0Character" src="" style="transform: rotate(-90deg)">
+            <img id="player1Character" src="" style="float: right; transform: rotate(90deg)">
+            <div id="player0Statblock">
+              <span id="player0hp"></span>
+            </div>
+            <div id="player1Statblock" style="float: right; clear: right;">
+              <span id="player1hp"></span>
+            </div>
+
+          </td>
+        </tr>
+        <tr style="height: 10vh;">
+          <td id="player0menu">
+            <button id="player0attack">ATTACK</button>
+            <button id="player0party">PARTY</button>
+          </td>
+          <td id="player1menu">
+            <button id="player1attack" disabled>ATTACK</button>
+            <button id="player1party" disabled>PARTY</button>
+          </td>
+        </tr>
+      </table>
+
+    <script>
+
+      var playerTurn = 1;
+
+      var turnChange = new Event('turnChange');
+
+      var player1Party = {
+        currentMember: -1,
+        party: [
+          {
+            name: "Tim",
+            image: "tim.png",
+            class: "warrior",
+            maxHealth: 80,
+            curHealth: 80,
+            attacks: [
+              {
+                name: "swing",
+                type: "melee",
+                dmg: 14
+              },
+              {
+                name: "shieldbash",
+                type: "force",
+                dmg: 12
+              }
+            ],
+            vulnerabilities: ["fire", "lightning"],
+            resistances: ["ranged", "cold"]
+          },
+          {
+            name: "Jenny",
+            image: "jenny.png",
+            class: "ranger",
+            maxHealth: 60,
+            curHealth: 60,
+            attacks: [
+              {
+                name: "arrow",
+                type: "ranged",
+                dmg: 16
+              },
+              {
+                name: "bow bash",
+                type: "force",
+                dmg: 10
+              }
+            ],
+            vulnerabilities: ["melee"],
+            resistances: ["lightning", "cold"]
+          },
+          {
+            name: "Bazza",
+            image: "bazza.png",
+            class: "mage",
+            maxHealth: 45,
+            curHealth: 45,
+            attacks: [
+              {
+                name: "fireball",
+                type: "fire",
+                dmg: 18
+              },
+              {
+                name: "lightning bolt",
+                type: "lightning",
+                dmg: 18
+              },
+              {
+                name: "cone of ice",
+                type: "cold",
+                dmg: 18
+              }
+            ],
+            vulnerabilities: ["ranged"],
+            resistances: ["force"]
+          }
+        ]
+      };
+
+      var player2Party = {
+        currentMember: -1,
+        party: [
+          {
+            name: "Ronnie",
+            image: "ronnie.png",
+            class: "warrior",
+            maxHealth: 80,
+            curHealth: 80,
+            attacks: [
+              {
+                name: "swing",
+                type: "melee",
+                dmg: 14
+              },
+              {
+                name: "shieldbash",
+                type: "force",
+                dmg: 12
+              }
+            ],
+            vulnerabilities: ["fire", "lightning"],
+            resistances: ["ranged", "cold"]
+          },
+          {
+            name: "Harold",
+            image: "harold.png",
+            class: "ranger",
+            maxHealth: 60,
+            curHealth: 60,
+            attacks: [
+              {
+                name: "arrow",
+                type: "ranged",
+                dmg: 16
+              },
+              {
+                name: "bow bash",
+                type: "force",
+                dmg: 10
+              }
+            ],
+            vulnerabilities: ["melee"],
+            resistances: ["lightning", "cold"]
+          },
+          {
+            name: "Nina",
+            image: "nina.png",
+            class: "mage",
+            maxHealth: 45,
+            curHealth: 45,
+            attacks: [
+              {
+                name: "fireball",
+                type: "fire",
+                dmg: 18
+              },
+              {
+                name: "lightning bolt",
+                type: "lightning",
+                dmg: 18
+              },
+              {
+                name: "cone of ice",
+                type: "cold",
+                dmg: 18
+              }
+            ],
+            vulnerabilities: ["ranged"],
+            resistances: ["force"]
+          }
+        ]
+      };
+
+
+      function updateHealth() {
+        document.getElementById("player0hp").innerText = player1Party.party[player1Party.currentMember].curHealth + "hp";
+        document.getElementById("player1hp").innerText = player2Party.party[player2Party.currentMember].curHealth + "hp";
+      }
+
+      function changeTurn() {
+        playerTurn = playerTurn ^ 1;
+        document.getElementById("playerTurnTracker").innerText = "Turn: Player " + (playerTurn + 1);
+        document.getElementById("player0menu").innerHTML = `<button id="player0attack">ATTACK</button>
+            <button id="player0party">PARTY</button>`;
+        document.getElementById("player1menu").innerHTML = `<button id="player1attack">ATTACK</button>
+            <button id="player1party">PARTY</button>`;
+
+
+        document.getElementById("player0attack").addEventListener("click", function() {
+
+          var markup = "";
+          for (var i = 0; i < player1Party.party[player1Party.currentMember].attacks.length; i++) {
+            markup += "<button id='attack" + i + "'>" + player1Party.party[player1Party.currentMember].attacks[i].name + "</button>";
+          }
+          markup += "<button id='resetmenu'>Back</button>";
+          document.getElementById("player0menu").innerHTML = markup;
+
+          for (var j = 0; j < player1Party.party[player1Party.currentMember].attacks.length; j++) {
+            document.getElementById("attack" + j).addEventListener("click", function() {
+              var id = parseInt(this.id.replace("attack", ""));
+              console.log(player1Party.party[player1Party.currentMember].attacks[id]);
+              console.log(player1Party.party[player1Party.currentMember].attacks);
+              var dmg = player1Party.party[player1Party.currentMember].attacks[id].dmg;
+              var critical = false;
+              if (player2Party.party[player2Party.currentMember].vulnerabilities.includes(player1Party.party[player1Party.currentMember].attacks[id].type)) {
+                dmg = Math.floor(dmg * 1.5);
+                critical = true;
+              }
+              console.log("dealing " + dmg + " dmg to " + player2Party.party[player2Party.currentMember].curHealth);
+              var updateText = player1Party.party[player1Party.currentMember].name + " deals " + dmg + " damage to " + player2Party.party[player2Party.currentMember].name + " with a " + player1Party.party[player1Party.currentMember].attacks[id].name + " attack.";
+              if (critical) {
+                updateText += " Critical hit!";
+              }
+
+              player2Party.party[player2Party.currentMember].curHealth = player2Party.party[player2Party.currentMember].curHealth - dmg;
+
+              if (player2Party.party[player2Party.currentMember].curHealth < 1) {
+                updateText += player2Party.party[player2Party.currentMember].name + " died.";
+              }
+
+              document.getElementById("statusBar").innerText = updateText;
+
+              updateHealth();
+              changeTurn();
+            });
+          }
+        });
+
+        document.getElementById("player1attack").addEventListener("click", function() {
+
+          var markup = "";
+          for (var i = 0; i < player2Party.party[player2Party.currentMember].attacks.length; i++) {
+            markup += "<button id='attack" + i + "'>" + player2Party.party[player2Party.currentMember].attacks[i].name + "</button>";
+          }
+          markup += "<button id='resetmenu'>Back</button>";
+          document.getElementById("player1menu").innerHTML = markup;
+
+          for (var j = 0; j < player2Party.party[player2Party.currentMember].attacks.length; j++) {
+            document.getElementById("attack" + j).addEventListener("click", function() {
+              var id = parseInt(this.id.replace("attack", ""));
+              console.log(player2Party.party[player2Party.currentMember].attacks[id]);
+              console.log(player2Party.party[player2Party.currentMember].attacks);
+              var dmg = player2Party.party[player2Party.currentMember].attacks[id].dmg;
+              var critical = false;
+              if (player1Party.party[player1Party.currentMember].vulnerabilities.includes(player2Party.party[player2Party.currentMember].attacks[id].type)) {
+                dmg = Math.floor(dmg * 1.5);
+                critical = true;
+              }
+              console.log("dealing " + dmg + " dmg to " + player1Party.party[player1Party.currentMember].curHealth);
+              var updateText = player2Party.party[player2Party.currentMember].name + " deals " + dmg + " damage to " + player1Party.party[player1Party.currentMember].name + " with a " + player2Party.party[player2Party.currentMember].attacks[id].name + " attack.";
+              if (critical) {
+                updateText += " Critical hit!";
+              }
+
+              player1Party.party[player1Party.currentMember].curHealth = player1Party.party[player1Party.currentMember].curHealth - dmg;
+
+              if (player1Party.party[player1Party.currentMember].curHealth < 1) {
+                updateText += player1Party.party[player1Party.currentMember].name + " died.";
+              }
+
+              document.getElementById("statusBar").innerText = updateText;
+
+              updateHealth();
+              changeTurn();
+            });
+          }
+        });
+
+        document.getElementById("player0party").addEventListener("click", function() {
+          var markup = "";
+          for (var i = 0; i < player1Party.party.length; i++) {
+            if (player1Party.party[i].curHealth < 1) {
+              markup += "<button id='party" + i + "' disabled>" + player1Party.party[i].name + " (" + player1Party.party[i].class + " " + player1Party.party[i].curHealth + "hp)</button>";
+            } else {
+              markup += "<button id='party" + i + "'>" + player1Party.party[i].name + " (" + player1Party.party[i].class + " " + player1Party.party[i].curHealth + "hp)</button>";
+            }
+          }
+          markup += "<button id='resetmenu'>back</button>";
+          document.getElementById("player0menu").innerHTML = markup;
+
+          for (var j = 0; j < player1Party.party.length; j++) {
+            document.getElementById("party" + j).addEventListener("click", function() {
+              var id = parseInt(this.id.replace("party", ""));
+              player1Party.currentMember = id;
+              document.getElementById("statusBar").innerText = player1Party.party[player1Party.currentMember].name + " joins the fray!";
+              document.getElementById("player0Character").src = player1Party.party[id].image;
+              document.getElementById("player0hp").innerText = player1Party.party[id].curHealth + "hp";
+              changeTurn()
+            });
+          }
+        });
+
+        document.getElementById("player1party").addEventListener("click", function() {
+          var markup = "";
+          for (var i = 0; i < player2Party.party.length; i++) {
+            if (player1Party.party[i].curHealth < 1) {
+              markup += "<button id='party" + i + "' disabled>" + player2Party.party[i].name + " (" + player2Party.party[i].class + " " + player2Party.party[i].curHealth + "hp)</button>";
+            } else {
+              markup += "<button id='party" + i + "'>" + player2Party.party[i].name + " (" + player2Party.party[i].class + " " + player2Party.party[i].curHealth + "hp)</button>";
+            }
+          }
+          markup += "<button id='resetmenu'>back</button>";
+          document.getElementById("player1menu").innerHTML = markup;
+
+          for (var j = 0; j < player2Party.party.length; j++) {
+            document.getElementById("party" + j).addEventListener("click", function() {
+              var id = parseInt(this.id.replace("party", ""));
+              player2Party.currentMember = id;
+              document.getElementById("statusBar").innerText = player2Party.party[player2Party.currentMember].name + " joins the fray!";
+              document.getElementById("player1Character").src = player2Party.party[id].image;
+              document.getElementById("player1hp").innerText = player2Party.party[id].curHealth + "hp";
+              changeTurn()
+            });
+          }
+        });
+
+
+        document.dispatchEvent(turnChange);
+      }
+
+
+      document.addEventListener("stateChange", function() {
+
+      });
+
+      document.addEventListener("turnChange", function() {
+        document.getElementById("player" + playerTurn + "attack").disabled = false;
+        document.getElementById("player" + playerTurn + "party").disabled = false;
+        document.getElementById("player" + (playerTurn ^ 1) + "attack").disabled = true;
+        document.getElementById("player" + (playerTurn ^ 1) + "party").disabled = true;
+        if (playerTurn === 0) {
+          if (player1Party.currentMember < 0 || player1Party.party[player1Party.currentMember].curHealth < 1) {
+            document.getElementById("player" + playerTurn + "attack").disabled = true;
+          }
+        } else {
+          if (player2Party.currentMember < 0 || player2Party.party[player2Party.currentMember].curHealth < 1) {
+            document.getElementById("player" + playerTurn + "attack").disabled = true;
+          }
+        }
+
+      });
+
+
+
+      changeTurn();
+
+    </script>
+  </body>
+</html>
